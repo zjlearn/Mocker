@@ -3,9 +3,7 @@ package com.zjlearn.mock;
 import net.andreinc.mockneat.MockNeat;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * create by zhangjun1 on 2017/9/20
@@ -38,6 +36,15 @@ public class ClassMock {
                     method.invoke(instance, mock.strings());
                 else if (paraType == Date.class)
                     method.invoke(instance, mock.localDates().thisMonth());
+                else  if (paraType ==List.class) { //集合类型
+                    paraType.
+                }else if(paraType == Set.class){
+
+                }else if(paraType == Map.class ){
+
+                }else if(paraType ){  //判断该类是否是一个接口
+
+                }
                 else if (true) { //子类，进行组合
                     Class childClass = paraType;
                     method.invoke(instance, ClassMock.newInstance(childClass));
