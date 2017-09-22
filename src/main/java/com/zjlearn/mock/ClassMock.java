@@ -2,6 +2,7 @@ package com.zjlearn.mock;
 
 import net.andreinc.mockneat.MockNeat;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,30 +18,29 @@ public class ClassMock {
     private static MockNeat mock = MockNeat.threadLocal();
 
     //返回的是Class类的实例
-    public static Object newInstance(Class<?> c) throws Exception {
-        Object instance = c.newInstance();
-        Method[] methods = c.getMethods();
-        List<Method> methodList = Arrays.asList(methods);
-        Class<?>[] paraTypes = new Class[]{};
+    public static <T> T newInstance(Class<T> c) throws Exception {
 
-        for (Method method : methodList) {
-            String name = method.getName();
-            if (name.contains("set")) {
-                paraTypes = method.getParameterTypes();
-                Class paraType = paraTypes[0];
-                if (paraType == Integer.class)   //判断参数的类型，并根据类型做相应的初始化调用
-                    method.invoke(instance, mock.ints().range(1, 1000).val());
-                else if (paraType == Long.class) {
-                    method.invoke(instance, mock.longs().range(1, 1000).val());
-                } else if (paraType == Double.class)
-                    method.invoke(instance, mock.doubles().range(1, 1000).val());
-                else if (paraType == String.class)
-                    method.invoke(instance, mock.strings());
-                else if (paraType == Date.class)
-                    method.invoke(instance, mock.localDates().thisMonth());
+        T instance = c.newInstance();
+        Field[] allFields=c.getDeclaredFields();
+        if(allFields!=null){
+            for(Field field:allFields){
+                Class fieldType=field.getType();
+                field.setAccessible(true);
+                if (fieldType == Integer.class || fieldType==int.class)   //判断参数的类型，并根据类型做相应的初始化调用
+                    field.set(instance,mock.ints().range(1, 1000).val());
+                else if (fieldType == Long.class|| fieldType==long.class) {
+                    field.set(instance, mock.longs().range(1, 1000).val());
+                }else if(fieldType == Float.class|| fieldType==float.class){
+                    field.set(instance,mock.floats().range(1, 1000).val());
+                } else if (fieldType == Double.class|| fieldType==double.class)
+                    field.set(instance,mock.doubles().range(1, 1000).val());
+                else if (fieldType == String.class)
+                    field.set(instance,mock.strings().toString());
+                else if (fieldType == Date.class)
+                    field.set(instance,mock.localDates().thisMonth());
                 else if (true) { //子类，进行组合
-                    Class childClass = paraType;
-                    method.invoke(instance, ClassMock.newInstance(childClass));
+                    Class childClass = fieldType;
+                    field.set(instance, ClassMock.newInstance(childClass));
                 }
             }
         }

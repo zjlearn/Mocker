@@ -26,7 +26,7 @@ public class MockServiceTest {
 
     @Test
     public void testClass() {
-        Student student = (Student) mockService.newInstance(Student.class);
+        Student student =mockService.newInstance(Student.class);
         System.out.println(student);
     }
 
