@@ -2,6 +2,7 @@ package com.zjlearn.mock;
 
 import net.andreinc.mockneat.MockNeat;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -15,39 +16,40 @@ public class ClassMock {
     private static MockNeat mock = MockNeat.threadLocal();
 
     //返回的是Class类的实例
-    public static Object newInstance(Class<?> c) throws Exception {
-        Object instance = c.newInstance();
-        Method[] methods = c.getMethods();
-        List<Method> methodList = Arrays.asList(methods);
-        Class<?>[] paraTypes = new Class[]{};
+    public static <T> T newInstance(Class<T> c) throws Exception {
+        T instance = c.newInstance();
+        Field[] allFields=c.getDeclaredFields();
+        if(allFields!=null){
+            for(Field field:allFields){
+                Class fieldType=field.getType();
+                field.setAccessible(true);
+                if (fieldType == Integer.class || fieldType==int.class)   //判断参数的类型，并根据类型做相应的初始化调用
+                    field.set(instance,mock.ints().range(1, 1000).val());
+                else if (fieldType == Long.class|| fieldType==long.class) {
+                    field.set(instance, mock.longs().range(1, 1000).val());
+                }else if(fieldType == Float.class|| fieldType==float.class){
+                    field.set(instance,mock.floats().range(1, 1000).val());
+                } else if (fieldType == Double.class|| fieldType==double.class)
+                    field.set(instance,mock.doubles().range(1, 1000).val());
+                else if (fieldType == String.class)
+                    field.set(instance,mock.strings().toString());
+                else if (fieldType == Date.class)
+                    field.set(instance,mock.localDates().thisMonth());
+                else if(fieldType ==Collection.class)  //如果是集合类型， 直接设置为空
+                    field.set(instance, null);
+                else if(fieldType.isInterface()){  //如果是接口的话， 在本地寻找相关的实现类，并递归初始化
+                    ClassLoader classLoader = ClassMock.class.getClassLoader();
 
-        for (Method method : methodList) {
-            String name = method.getName();
-            if (name.contains("set")) {
-                paraTypes = method.getParameterTypes();
-                Class paraType = paraTypes[0];
-                if (paraType == Integer.class)   //判断参数的类型，并根据类型做相应的初始化调用
-                    method.invoke(instance, mock.ints().range(1, 1000).val());
-                else if (paraType == Long.class) {
-                    method.invoke(instance, mock.longs().range(1, 1000).val());
-                } else if (paraType == Double.class)
-                    method.invoke(instance, mock.doubles().range(1, 1000).val());
-                else if (paraType == String.class)
-                    method.invoke(instance, mock.strings());
-                else if (paraType == Date.class)
-                    method.invoke(instance, mock.localDates().thisMonth());
-                else  if (paraType ==List.class) { //集合类型
-                    paraType.
-                }else if(paraType == Set.class){
+                    //TODO 查询实现该接口的类
 
-                }else if(paraType == Map.class ){
 
-                }else if(paraType ){  //判断该类是否是一个接口
+                    //TODO 递归调用该类
+
 
                 }
                 else if (true) { //子类，进行组合
-                    Class childClass = paraType;
-                    method.invoke(instance, ClassMock.newInstance(childClass));
+                    Class childClass = fieldType;
+                    field.set(instance, ClassMock.newInstance(childClass));
                 }
             }
         }
