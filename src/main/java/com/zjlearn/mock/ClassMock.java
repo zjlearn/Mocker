@@ -55,4 +55,5 @@ public class ClassMock {
         }
         return instance;  //返回一个Object对象
     }
+
 }
