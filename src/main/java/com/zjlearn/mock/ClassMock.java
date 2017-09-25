@@ -52,7 +52,7 @@ public class ClassMock {
                         field.set(instance, mock.names().val());
                     else if(fieldName.contains("sex") || fieldName.contains("gender"))
                         field.set(instance, mock.genders().val());
-                    else if(fieldName.contains("email"))
+                    else if(fieldName.contains("email") || fieldName.equals("mail"))
                         field.set(instance, mock.emails().val());
                     else if(fieldName.contains("url"))
                         field.set(instance, mock.urls().val());
