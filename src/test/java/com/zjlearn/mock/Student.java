@@ -1,5 +1,7 @@
 package com.zjlearn.mock;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -10,8 +12,8 @@ public class Student {
     private String name;
     private String sex;
     private float height;
-    private List<Address> addresses;
-    private Address address;
+    private List<String> photos;
+
 
     public Student() {
     }
@@ -48,21 +50,11 @@ public class Student {
         this.height = height;
     }
 
-    public List<Address> getAddresses() {
-        return addresses;
+
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
     }
 
-    public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
-    }
 
-    @Override
-    public String toString() {
-        return "Student{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", sex='" + sex + '\'' +
-                ", height=" + height +
-                '}';
-    }
 }

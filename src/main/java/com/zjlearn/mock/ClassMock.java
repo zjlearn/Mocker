@@ -3,7 +3,8 @@ package com.zjlearn.mock;
 import net.andreinc.mockneat.MockNeat;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -24,16 +25,28 @@ public class ClassMock {
                 Class fieldType=field.getType();
                 String fieldName = field.getName().toLowerCase();
                 field.setAccessible(true);
-                if (fieldType == Integer.class || fieldType==int.class)   //判断参数的类型，并根据类型做相应的初始化调用
-                    field.set(instance,mock.ints().range(1, 1000).val());
+                if (fieldType == Integer.class || fieldType==int.class) {   //判断参数的类型，并根据类型做相应的初始化调用
+                    if(fieldName.contains("id"))
+                        field.set(instance, mock.uuids().val());
+                    else
+                        field.set(instance, mock.ints().range(1, 1000).val());
+                }
                 else if (fieldType == Long.class|| fieldType==long.class) {
-                    field.set(instance, mock.longs().range(1, 1000).val());
+                    if(fieldName.contains("id"))
+                        field.set(instance, mock.uuids().val());
+                    else
+                        field.set(instance, mock.longs().range(1, 1000).val());
                 }else if(fieldType == Float.class|| fieldType==float.class){
                     field.set(instance,mock.floats().range(1, 1000).val());
                 } else if (fieldType == Double.class|| fieldType==double.class)
                     field.set(instance,mock.doubles().range(1, 1000).val());
                 else if(fieldType== Date.class)
                     field.set(instance, mock.localDates().val());
+                else if(fieldType == BigDecimal.class)
+                    field.set(instance,new BigDecimal(mock.doubles().val()));
+                else if(fieldType == Timestamp.class){
+                    field.set(instance, new Timestamp(System.currentTimeMillis()));
+                }
                 else if (fieldType == String.class) {
                     if(fieldName.contains("name"))
                         field.set(instance, mock.names().val());
@@ -45,6 +58,7 @@ public class ClassMock {
                         field.set(instance, mock.urls().val());
                     else if(fieldName.contains("address"))
                         field.set(instance, mock.departments().val());
+
                 }
                 else if (fieldType == Date.class)
                     field.set(instance,mock.localDates().thisMonth());
